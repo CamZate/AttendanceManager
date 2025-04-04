@@ -75,6 +75,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnDisable()
     {
+        //remove listeners
         for (int i = 0; i < typeButton.Length; i++)
         {
             typeButton[i].onClick.RemoveListener(OnTypeButtonClick);
