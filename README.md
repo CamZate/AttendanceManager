@@ -1,5 +1,4 @@
 # Attendance Manager
 
 Simple attendance manager made in unity specifically designed for thapar students
-
-![screenshot](Assets/Screenshots/image_002_0001.png)
+<img src="Assets/Screenshots/image_002_0001.png" alt="screenshot" width="500">
