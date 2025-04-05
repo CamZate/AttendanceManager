@@ -15,6 +15,9 @@ public class cardsManager : MonoBehaviour
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private Transform cardparent;
 
+    [SerializeField] private TextMeshProUGUI indicatorBar;
+    [SerializeField] private List<card> cardsList = new List<card>();
+    
 
     private void Start() {
         addCardButton.onClick.AddListener(OnAddCardButtonClick);
@@ -23,6 +26,40 @@ public class cardsManager : MonoBehaviour
         if(cardStats == null) return; // Check if data is null
         foreach(string key in cardStats.data.Keys){
             Instantiate(cardPrefab, cardparent).GetComponent<card>().cardName = key;
+        }
+        cardsList = new List<card>(cardparent.GetComponentsInChildren<card>());
+    }
+
+    bool isHolding = false;
+    bool isHolding_undo = false;
+    private void Update() {
+        isHolding = false;
+        isHolding_undo = false;
+        int ratioValue = 0; // Initialize ratioValue to 0
+        int ratioValue_undo = 0; // Initialize ratioValue to 0
+        for(int i = 0; i < cardsList.Count; i++) {
+            if(cardsList[i] != null) {
+                if(cardsList[i].returnHoldRatio() > 3){
+                    isHolding = true;
+                    ratioValue = cardsList[i].returnHoldRatio(); // Check if any card is being held
+                } // Update the card name if needed
+            }
+            if(cardsList[i] != null) {
+                if(cardsList[i].returnHoldRatio_undo() > 2){
+                    isHolding_undo = true;
+                    ratioValue_undo = cardsList[i].returnHoldRatio_undo(); // Check if any card is being held
+                } // Update the card name if needed
+            }
+        }
+        indicatorBar.text = ""; // Clear the indicator bar text
+        if(isHolding && !isHolding_undo) {
+            indicatorBar.color = Color.red; // Change the color to red if a card is being held
+            indicatorBar.text = "Deleting: |" + new string('>',ratioValue) + new string(' ',31-ratioValue) + "|"; // Update the indicator bar text
+        }
+
+        if(isHolding_undo && !isHolding) {
+            indicatorBar.color = Color.grey; // Change the color to red if a card is being held
+            indicatorBar.text = "Undo: |" + new string('>',ratioValue_undo) + new string(' ',35-ratioValue_undo) + "|"; // Update the indicator bar text
         }
     }
 
@@ -46,7 +83,9 @@ public class cardsManager : MonoBehaviour
             Debug.Log("Adding card: " + cardName);
             newCardNameText.text = ""; // Clear the input field after adding
 
-            Instantiate(cardPrefab, cardparent).GetComponent<card>().cardName = cardName;
+            GameObject card = Instantiate(cardPrefab, cardparent);
+            card.GetComponent<card>().cardName = cardName;
+            cardsList.Add(card.GetComponent<card>()); // Add the new card to the list 
         } else {
             Debug.Log("Card name cannot be empty!");
         }

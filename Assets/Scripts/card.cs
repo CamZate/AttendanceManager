@@ -43,6 +43,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [SerializeField] private Stack<int> actions = new Stack<int>();
 
     Vector2 labelPosition = new Vector2(0, 0);
+    public buttonHold BH;
 
     private void OnEnable()
     {
@@ -86,6 +87,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     
     float x = 50f;
+    float maxTime = 2f;
     private void FixedUpdate()
     {
         // Update the card's state or perform any other actions here if needed
@@ -95,10 +97,10 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             x = Mathf.Lerp(x, 230f, Time.deltaTime * 15f);
             nameText.transform.localPosition += Random.Range(-x, x) * Vector3.right * Time.deltaTime;
             holdTimer += Time.deltaTime;
-            if (holdTimer >= 3f)
+            if (holdTimer >= maxTime)
             {
                 OnHoldComplete();
-                isHolding = false;
+                holdTimer = 0f;
             }
         }else{
             x = 0f;
@@ -275,8 +277,15 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             updateState();
         }
     }
-    private bool isHolding = false;
+    public bool isHolding = false;
     private float holdTimer = 0f;
+
+    public int returnHoldRatio(){
+        return (int)((holdTimer / maxTime) * 32f);
+    }
+    public int returnHoldRatio_undo(){
+        return (int)((BH.holdTimer / BH.holdTime) * 35f);
+    }
     public void OnPointerDown(PointerEventData eventData)
     {
         isHolding = true;

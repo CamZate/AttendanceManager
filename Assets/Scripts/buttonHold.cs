@@ -6,8 +6,8 @@ using System.Collections;
 
 public class buttonHold : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    [SerializeField] private float holdTime = 1f; // Time in seconds to hold the button
-    private float holdTimer = 0f;
+    public float holdTime = .5f; // Time in seconds to hold the button
+    public float holdTimer = 0f;
     private bool isHolding = false;
     [SerializeField] private card cardScript; // Reference to the card script
     [SerializeField] GameObject cancelImage;
@@ -20,7 +20,8 @@ public class buttonHold : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             if (holdTimer >= holdTime)
             {
                 OnHoldComplete();
-                isHolding = false;
+                holdTimer = 0f;
+                isHolding = false; // Reset the timer after hold is complete
             }
         }
     }
@@ -49,6 +50,5 @@ public class buttonHold : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         cancelImage.SetActive(true); // Show the cancel image
         yield return new WaitForSeconds(.8f); // Wait for 1 second
         cancelImage.SetActive(false); // Hide the cancel image
-        isHolding = false; // Reset the holding state
     }
 }
