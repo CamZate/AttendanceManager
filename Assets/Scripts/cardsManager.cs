@@ -17,17 +17,20 @@ public class cardsManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI indicatorBar;
     [SerializeField] private List<card> cardsList = new List<card>();
-    
 
-    private void Start() {
+
+    private void Start()
+    {
         addCardButton.onClick.AddListener(OnAddCardButtonClick);
         addCardButton.interactable = false; // Disable the button initially
         cardData cardStats = LoadData(); // Load the card data
-        if(cardStats == null) return; // Check if data is null
-        foreach(string key in cardStats.data.Keys){
+        if (cardStats == null) return; // Check if data is null
+        foreach (string key in cardStats.data.Keys)
+        {
             Instantiate(cardPrefab, cardparent).GetComponent<card>().cardName = key;
         }
         cardsList = new List<card>(cardparent.GetComponentsInChildren<card>());
+        newCardNameText.shouldHideMobileInput = true; // Hide the mobile keyboard input
     }
 
     bool isHolding = false;

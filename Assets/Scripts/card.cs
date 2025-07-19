@@ -22,6 +22,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [SerializeField] private TextMeshProUGUI labAmtText;
     [SerializeField] private TextMeshProUGUI tutAmtText;
     [SerializeField] private TextMeshProUGUI percentageText;
+    [SerializeField] private TextMeshProUGUI lectureSkip;
     [Header("Emoji")]
     [SerializeField] private Image emojiImage;
     [SerializeField] private Sprite[] emojiSprites = new Sprite[3];
@@ -85,7 +86,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         absentButton.onClick.RemoveListener(OnAbsentButtonClick);
     }
 
-    
+
     float x = 50f;
     float maxTime = 2f;
     private void FixedUpdate()
@@ -93,7 +94,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         // Update the card's state or perform any other actions here if needed
         if (nameText.text != cardName) nameText.text = cardName;
         if (isHolding)
-        {   
+        {
             x = Mathf.Lerp(x, 230f, Time.deltaTime * 15f);
             nameText.transform.localPosition += Random.Range(-x, x) * Vector3.right * Time.deltaTime;
             holdTimer += Time.deltaTime;
@@ -102,7 +103,9 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 OnHoldComplete();
                 holdTimer = 0f;
             }
-        }else{
+        }
+        else
+        {
             x = 0f;
             nameText.transform.localPosition = labelPosition;
         }
@@ -122,9 +125,47 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
     [SerializeField] private float percentage = 0f;
-    [SerializeField] private float totalPercentage = 0f;
+    [SerializeField] private float totalPercentage = 76f;
+
+    void CalculateSkips()
+    {
+
+        float tempPercentage = totalPercentage;
+        int lectTemp = lectTotal;
+        while (tempPercentage > 74.9f)
+        {
+            // Calculate the percentage and update the percentage text
+            float lectPercentage = 0f;
+            float labPercentage = 0f;
+            float tutPercentage = 0f;
+
+            if (lectTotal != 0) lectPercentage = (lectAmt / (float)lectTemp) * 100f;
+            if (labTotal != 0) labPercentage = (labAmt / (float)labTotal) * 100f;
+            if (tutTotal != 0) tutPercentage = (tutAmt / (float)tutTotal) * 100f;
+
+            float[] totals = new float[3] { lectTotal, labTotal, tutTotal };
+            int count = 0;
+            for (int i = 0; i < totals.Length; i++)
+            {
+                if (totals[i] > 0f) count++;
+            }
+            tempPercentage = (lectPercentage + labPercentage + tutPercentage) / (float)count;
+            Debug.Log(tempPercentage);
+            lectTemp ++;
+        }
+        if ((lectTemp - lectAmt) > 0)
+        {
+            lectureSkip.text = "You can skip " + (lectTemp - lectAmt).ToString() + " lectures";
+        }
+        else
+        {
+            lectureSkip.text = "You cannot skip any lectures";
+        }
+        //Debug.Log("lectTemp: " + lectTemp + ", LectAmt: " + lectAmt);
+    }
     void updateState()
     {
+        //CalculateSkips();
         nameText.text = cardName;
         // Update the card's state based on the current values of lectAmt, labAmt, and tutAmt
         lectAmtText.text = lectAmt.ToString() + "/" + lectTotal.ToString();
@@ -145,16 +186,16 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         float labPercentage = 0f;
         float tutPercentage = 0f;
 
-        if(lectTotal!=0) lectPercentage = (lectAmt / (float)lectTotal) * 100f;
-        if(labTotal!=0) labPercentage = (labAmt / (float)labTotal) * 100f;
-        if(tutTotal!=0) tutPercentage = (tutAmt / (float)tutTotal) * 100f;
+        if (lectTotal != 0) lectPercentage = (lectAmt / (float)lectTotal) * 100f;
+        if (labTotal != 0) labPercentage = (labAmt / (float)labTotal) * 100f;
+        if (tutTotal != 0) tutPercentage = (tutAmt / (float)tutTotal) * 100f;
 
         //float[] percentages = new float[3] { lectPercentage, labPercentage, tutPercentage };
         float[] totals = new float[3] { lectTotal, labTotal, tutTotal };
         int count = 0;
-        for(int i = 0; i < totals.Length; i++)
+        for (int i = 0; i < totals.Length; i++)
         {
-            if(totals[i] > 0f) count++;
+            if (totals[i] > 0f) count++;
         }
         totalPercentage = (lectPercentage + labPercentage + tutPercentage) / (float)count;
         // Calculate the total and amount based on the current type
@@ -189,13 +230,11 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             emojiImage.gameObject.SetActive(true);
             emojiImage.sprite = emojiSprites[1];
-            Debug.Log("Dead");
         }
         else if (totalPercentage > 20f && totalPercentage < 75f)
         {
             emojiImage.gameObject.SetActive(true);
             emojiImage.sprite = emojiSprites[0];
-            Debug.Log("Warning");
         }
         else
         {
@@ -280,10 +319,12 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public bool isHolding = false;
     private float holdTimer = 0f;
 
-    public int returnHoldRatio(){
+    public int returnHoldRatio()
+    {
         return (int)((holdTimer / maxTime) * 32f);
     }
-    public int returnHoldRatio_undo(){
+    public int returnHoldRatio_undo()
+    {
         return (int)((BH.holdTimer / BH.holdTime) * 35f);
     }
     public void OnPointerDown(PointerEventData eventData)
@@ -371,11 +412,9 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         BinaryFormatter formatter = new BinaryFormatter();
         string path = Application.persistentDataPath + "/" + "data" + ".lol";
         FileStream stream = new FileStream(path, FileMode.Create);
-        Debug.Log("Stream Opened!");
         cardData data = new cardData(this, dict, removal);
         formatter.Serialize(stream, data);
         stream.Close();
-        Debug.Log("Stream Close!");
     }
 
     cardData LoadData()
