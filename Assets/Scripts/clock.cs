@@ -9,26 +9,26 @@ public class clock : MonoBehaviour
     [SerializeField] private TMP_Text clockText;
     [SerializeField] private TMP_Text dateText;
 
-    private void Update() {
-        DateTime time = DateTime.Now;
-
-        string hour = "";
-        string minute = LeadingZero(time.Minute);
-        string second = LeadingZero(time.Second);
-        string AMPM = time.Hour > 12 ? "PM" : "AM";
-
-        string day = LeadingZero(time.Day);
-        string month = LeadingZero(time.Month);
-        string year = LeadingZero(time.Year);
-        string weekday = time.DayOfWeek.ToString();
-
-        if(time.Hour >12){ 
-            hour = LeadingZero(time.Hour-12);
-        }else{
-            hour = LeadingZero(time.Hour);
+    private void Update()
+    {
+        if (updateLastChanged.isUpdated)
+        {
+            updateLastChanged.isUpdated = false;
+            ChangeDate();
         }
-        clockText.text = hour + ":" + minute + "  " + AMPM;
-        dateText.text = day + "/" + month + "/" + year + "   -->  " + "<color=#FF2B00>" + weekday + "</color>";
+    }
+    private void ChangeDate()
+    {
+        DateTime time = DateTime.Now;
+        //clockText.text = hour + ":" + minute + "  " + AMPM;
+        if (PlayerPrefs.GetString("Time", "") == "")
+        {
+            dateText.text = "";
+        }
+        else
+        {
+            dateText.text = PlayerPrefs.GetString("Date", "__") + "   -->   " + "<color=#FF2B00>" + PlayerPrefs.GetString("Weekday", "__") + "</color>" + "   -->   " + PlayerPrefs.GetString("Time", "__") + "  " + PlayerPrefs.GetString("AMPM", "__");
+        }
     }
 
     string LeadingZero(int n)

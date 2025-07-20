@@ -8,14 +8,17 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class cardData
 {
     public string cardName;
-    public Dictionary<string, Dictionary<string,int>> data = new Dictionary<string, Dictionary<string,int>>();
+    public Dictionary<string, Dictionary<string, int>> data = new Dictionary<string, Dictionary<string, int>>();
 
-    public cardData(card cardStats, Dictionary<string, Dictionary<string,int>> dataTemp, bool removal = false){
-        
-        if (dataTemp != null){
+    public cardData(card cardStats, Dictionary<string, Dictionary<string, int>> dataTemp, bool removal = false)
+    {
+
+        if (dataTemp != null)
+        {
             data = dataTemp;
         }
-        if(removal){
+        if (removal)
+        {
             data.Remove(cardStats.cardName);
             return;
         }

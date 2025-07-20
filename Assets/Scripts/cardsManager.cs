@@ -81,7 +81,8 @@ public class cardsManager : MonoBehaviour
 
     private void OnAddCardButtonClick() {
         string cardName = newCardNameText.text;
-        if (!string.IsNullOrEmpty(cardName)) {
+        if (!string.IsNullOrEmpty(cardName))
+        {
             // Add the card to the list or perform any other action
             Debug.Log("Adding card: " + cardName);
             newCardNameText.text = ""; // Clear the input field after adding
@@ -89,7 +90,11 @@ public class cardsManager : MonoBehaviour
             GameObject card = Instantiate(cardPrefab, cardparent);
             card.GetComponent<card>().cardName = cardName;
             cardsList.Add(card.GetComponent<card>()); // Add the new card to the list 
-        } else {
+            Vibrator.Vibrate(75); // Vibrate for 50 milliseconds
+            updateLastChanged.record(); // Record the last changed time
+        }
+        else
+        {
             Debug.Log("Card name cannot be empty!");
         }
     }

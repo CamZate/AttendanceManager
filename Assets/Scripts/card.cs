@@ -314,6 +314,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                     break;
             }
             updateState();
+            updateLastChanged.record();
         }
     }
     public bool isHolding = false;
@@ -342,6 +343,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         Debug.Log("Hold complete!");
         SaveData(true);
         Destroy(gameObject);
+        updateLastChanged.record();
     }
     private void OnTypeButtonClick()
     {
@@ -376,6 +378,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         cmds.Push(currentType);
         actions.Push(1);
         updateState();
+        updateLastChanged.record();
     }
     private void OnAbsentButtonClick()
     {
@@ -400,6 +403,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         cmds.Push(currentType);
         actions.Push(0);
         updateState();
+        updateLastChanged.record();
     }
     void SaveData(bool removal = false)
     {

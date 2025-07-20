@@ -25,8 +25,9 @@ public class sidebarAnimation : MonoBehaviour
         menusButton.onClick.AddListener(ToggleSidebar);
     }
 
-    void ToggleSidebar()
+    public void ToggleSidebar()
     {
+        Vibrator.Vibrate(50); // Vibrate for 50 milliseconds
         CanvasGroup canvasGroup = shade.GetComponent<CanvasGroup>();
         currentPosition = rt.localPosition;
         if (!isOpen)
