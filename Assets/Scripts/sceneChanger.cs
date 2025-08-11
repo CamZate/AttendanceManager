@@ -9,14 +9,18 @@ public class sceneChanger : MonoBehaviour
 {
     [SerializeField] private Button attendanceButton;
     [SerializeField] private Button cgpaButton;
+    [SerializeField] private Button eventManagerButton;
 
     [SerializeField] private sidebarAnimation sidebarAnimation;
 
     private void Start()
     {
         sidebarAnimation = GetComponent<sidebarAnimation>();
-        attendanceButton.onClick.AddListener(() => { ChangeScene(0); attendanceButton.interactable = false; cgpaButton.interactable = true; StartCoroutine(toggleSidebar()); });
-        cgpaButton.onClick.AddListener(() => { ChangeScene(1); cgpaButton.interactable = false; attendanceButton.interactable = true; StartCoroutine(toggleSidebar()); });
+        attendanceButton.onClick.AddListener(() => { ChangeScene(0); StartCoroutine(toggleSidebar()); });
+        cgpaButton.onClick.AddListener(() => { ChangeScene(1); StartCoroutine(toggleSidebar()); });
+        eventManagerButton.onClick.AddListener(() => { ChangeScene(2); StartCoroutine(toggleSidebar()); });
+        int lastSceneIndex = PlayerPrefs.GetInt("LastScene", 0); // Get the last scene index or default to 0
+        ChangeScene(lastSceneIndex); // Change to the last scene on start
     }
 
     IEnumerator toggleSidebar()
@@ -37,6 +41,7 @@ public class sceneChanger : MonoBehaviour
             Debug.Log("Already in the requested scene.");
             return;
         }
+        PlayerPrefs.SetInt("LastScene", sceneIndex); // Save the last scene index
         SceneManager.LoadScene(sceneIndex);
     }
 }

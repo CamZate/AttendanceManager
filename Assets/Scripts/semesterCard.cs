@@ -69,28 +69,39 @@ public class semesterCard : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     void Start()
     {
         editButton.onClick.AddListener(OnEditButtonClick);
-        addButton.onClick.AddListener(() =>
-        {
-            string subjectName = newSubjectNameText.text;
-            string subjectCredit = newSubjectCreditText.text;
-            if (!string.IsNullOrEmpty(subjectName) && !string.IsNullOrEmpty(subjectCredit) && float.TryParse(subjectCredit, out float creditValue))
-            {
-                AddSubject(subjectName, new float[] { creditValue, 0f });
-            }
-        });
+        addButton.onClick.AddListener(GetNewSubjectInput);
         rt = GetComponent<RectTransform>();
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, offset); // Set initial height of the semester card
         calculateSGPA(); // Calculate SGPA on start
+
+        newSubjectNameText.onSubmit.AddListener((text) => newSubjectCreditText.ActivateInputField()); // Move focus to credit input field on subject name submit
+        newSubjectCreditText.onSubmit.AddListener((text) => GetNewSubjectInput()); // Call GetNewSubjectInput on credit input field submit
+    }
+
+    void GetNewSubjectInput()
+    {
+        string subjectName = newSubjectNameText.text.Trim();
+        string subjectCredit = newSubjectCreditText.text.Trim();
+        if (!string.IsNullOrEmpty(subjectName) && !string.IsNullOrEmpty(subjectCredit) && float.TryParse(subjectCredit, out float creditValue))
+        {
+            AddSubject(subjectName, new float[] { creditValue, 0f });
+        }
+        Vibrator.Vibrate(50); // Vibrate for 50 milliseconds
     }
 
     [SerializeField]
-    private Dictionary<float , string> gradeInfo = new Dictionary<float, string>
+    private Dictionary<float, string> gradeInfo = new Dictionary<float, string>
     {
         { 10, "A" },
         { 9, "A-" },
         { 8, "B" },
         { 7, "B-" },
-        { 6, "C" }
+        { 6, "C" },
+        { 5, "C-" },
+        { 2, "E" },
+        { 0, "F" },
+        { -1, "I" }, // I for incomplete
+        { -2, "X" } // X for absent
     };
 
     public void updateSubjects()
@@ -119,6 +130,7 @@ public class semesterCard : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
         SM.logSemesters(); // Log the current semesters for debugging
         SM.SaveData(); // Save the semester data when editing starts or stops
+        Vibrator.Vibrate(75); // Vibrate for 50 milliseconds
     }
 
     [SerializeField] private float holdDuration = 1f; // Duration to hold the card before deletion
@@ -162,7 +174,16 @@ public class semesterCard : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
                 holdTimer = 0f;
             }
         }
-        //Debug.Log("Hold Timer: " + holdTimer);
+        string subjectName = newSubjectNameText.text;
+        string subjectCredit = newSubjectCreditText.text;
+        if (string.IsNullOrEmpty(subjectName) || string.IsNullOrEmpty(subjectCredit) || !float.TryParse(subjectCredit, out float creditValue))
+        {
+            addButton.interactable = false; // Disable the button if input is invalid
+        }
+        else
+        {
+            addButton.interactable = true; // Enable the button if input is valid
+        }
     }
 
     private void OnHoldComplete()
@@ -225,6 +246,7 @@ public class semesterCard : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             float credit = subject.Value[0];
             float grade = subject.Value[1];
+            if (grade < 0) continue; // Skip invalid grades
             totalCredits += credit;
             totalPoints += credit * grade; // Assuming grade is a numeric value
         }
@@ -232,11 +254,12 @@ public class semesterCard : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         if (totalCredits > 0)
         {
             float sgpa = totalPoints / totalCredits;
+            sgpa = Mathf.Floor(sgpa * 100f) / 100f; // Round SGPA to 2 decimal places
             sgpaDisplayText.text = sgpa.ToString("F2");
         }
         else
         {
-            sgpaDisplayText.text = "##";
+            sgpaDisplayText.text = "<color=#3D3D3D>--</color>"; // Display placeholder if no credits
         }
 
         credits = totalCredits; // Update the total credits for the semester card

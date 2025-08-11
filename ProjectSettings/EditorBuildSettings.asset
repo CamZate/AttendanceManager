@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Cgpa.unity
     guid: ff09847abf943834782670e8860fc43d
+  - enabled: 1
+    path: Assets/Scenes/EventManager.unity
+    guid: 6533b04f065a3424b877fd6180e1aaf5
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

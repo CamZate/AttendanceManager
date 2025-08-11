@@ -76,7 +76,7 @@ public class SemesterManager : MonoBehaviour
 
     private void OnAddSemesterButtonClick()
     {
-        Vibrator.Vibrate(50); // Vibrate for 50 milliseconds
+        Vibrator.Vibrate(75); // Vibrate for 50 milliseconds
         int numberofSemesters = semesterCardParent.childCount; // Increment the number of semesters
         if (numberofSemesters >= 24) // Limit to 8 semesters
         {
@@ -108,19 +108,14 @@ public class SemesterManager : MonoBehaviour
                 {
                     card.semesterIndex--; // Adjust the index of subsequent cards
                 }
-
                 card.updateSemesterIndex(); // Update the index display
-            }
-            Debug.Log("Removed semester card at index: " + semesterIndex);
-            for (int i = 0; i < semesterCardParent.childCount - 1; i++)
-            {
-                semesterCard card = semesterCardParent.GetChild(i).GetComponent<semesterCard>();
                 mainData[card.semesterIndex] = card.subjectInfo; // Reinitialize the main data with the remaining cards
             }
+            Debug.Log("Removed semester card at index: " + semesterIndex);
             UpdateCGPA(); // Recalculate CGPA after removing a semester
             SaveData(); // Save data after removing a semester
+            logSemesters(); // Log the current semesters for debugging
         }
-        logSemesters(); // Log the current semesters for debugging
     }
 
     public void logSemesters()
@@ -158,6 +153,7 @@ public class SemesterManager : MonoBehaviour
             foreach (var subject in semester.Value)
             {
                 float[] subjectData = subject.Value;
+                if(subjectData[1] < 0) continue; // Skip invalid grades
                 totalCredits += subjectData[0]; // Credits
                 totalPoints += subjectData[0] * subjectData[1]; // Credits * Grade Points
             }
@@ -166,7 +162,8 @@ public class SemesterManager : MonoBehaviour
         if (totalCredits > 0)
         {
             float CGPA = totalPoints / totalCredits;
-            CGPAText.text = CGPA.ToString("F2");
+            CGPA = Mathf.Floor(CGPA * 100f) / 100f; // Round CGPA to 2 decimal places
+            CGPAText.text = CGPA.ToString("F2"); // Format CGPA to 2 decimal places
         }
         else
         {

@@ -129,43 +129,29 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     void CalculateSkips()
     {
-
-        float tempPercentage = totalPercentage;
-        int lectTemp = lectTotal;
-        while (tempPercentage > 74.9f)
+        int currentLectures = lectAmt;
+        int currentTotalLectures = lectTotal;
+        float currentLectPerctenage = (currentLectures/ (float)currentTotalLectures) * 100f;
+        if (currentLectPerctenage < 75f)
         {
-            // Calculate the percentage and update the percentage text
-            float lectPercentage = 0f;
-            float labPercentage = 0f;
-            float tutPercentage = 0f;
+            lectureSkip.text = "Lecture Skips: 0";
+            return; // No skips if percentage is below 75%
+        }
 
-            if (lectTotal != 0) lectPercentage = (lectAmt / (float)lectTemp) * 100f;
-            if (labTotal != 0) labPercentage = (labAmt / (float)labTotal) * 100f;
-            if (tutTotal != 0) tutPercentage = (tutAmt / (float)tutTotal) * 100f;
-
-            float[] totals = new float[3] { lectTotal, labTotal, tutTotal };
-            int count = 0;
-            for (int i = 0; i < totals.Length; i++)
+        while (currentLectPerctenage > 75f)
+        {
+            currentTotalLectures++;
+            currentLectPerctenage = (currentLectures / (float)currentTotalLectures) * 100f;
+            if (currentLectPerctenage < 75f)
             {
-                if (totals[i] > 0f) count++;
+                currentTotalLectures--; // Decrease total lectures if percentage drops below 75%
+                break; // Stop if percentage drops below 75%
             }
-            tempPercentage = (lectPercentage + labPercentage + tutPercentage) / (float)count;
-            Debug.Log(tempPercentage);
-            lectTemp ++;
         }
-        if ((lectTemp - lectAmt) > 0)
-        {
-            lectureSkip.text = "You can skip " + (lectTemp - lectAmt).ToString() + " lectures";
-        }
-        else
-        {
-            lectureSkip.text = "You cannot skip any lectures";
-        }
-        //Debug.Log("lectTemp: " + lectTemp + ", LectAmt: " + lectAmt);
+        lectureSkip.text = $"Lecture Skips: <color=#FF2B00>{(currentTotalLectures - lectTotal).ToString()}</color>";
     }
     void updateState()
     {
-        //CalculateSkips();
         nameText.text = cardName;
         // Update the card's state based on the current values of lectAmt, labAmt, and tutAmt
         lectAmtText.text = lectAmt.ToString() + "/" + lectTotal.ToString();
@@ -261,6 +247,7 @@ public class card : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             undo.SetActive(false);
         }
 
+        CalculateSkips();
         SaveData();
     }
 

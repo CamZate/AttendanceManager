@@ -31,6 +31,7 @@ public class cardsManager : MonoBehaviour
         }
         cardsList = new List<card>(cardparent.GetComponentsInChildren<card>());
         newCardNameText.shouldHideMobileInput = true; // Hide the mobile keyboard input
+        newCardNameText.onSubmit.AddListener((text) => OnAddCardButtonClick()); // Add listener for input submission
     }
 
     bool isHolding = false;
@@ -81,6 +82,14 @@ public class cardsManager : MonoBehaviour
 
     private void OnAddCardButtonClick() {
         string cardName = newCardNameText.text;
+        foreach (card existingCard in cardsList)
+        {
+            if (existingCard.cardName == cardName)
+            {
+                Debug.Log("Card with this name already exists!");
+                return; // Prevent adding a card with the same name
+            }
+        }
         if (!string.IsNullOrEmpty(cardName))
         {
             // Add the card to the list or perform any other action

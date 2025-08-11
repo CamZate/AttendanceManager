@@ -14,11 +14,18 @@ public class subjectCard : MonoBehaviour
     public TMP_InputField gradeInputField;
     [SerializeField] private Dictionary<string, float> gradeInfo = new Dictionary<string, float>
     {
+        { "A+", 10 },
         { "A", 10 },
         { "A-", 9 },
         { "B", 8 },
         { "B-", 7 },
-        { "C", 6 }
+        { "C", 6 },
+        { "C-", 5 },
+        { "E", 2 },
+        { "F", 0 },
+        { "I", -1 }, 
+        { "X", -2 } // X for absent
+
     };
 
     public void OnEnable()
@@ -26,7 +33,8 @@ public class subjectCard : MonoBehaviour
         subjectNameText.text = subjectName + "\nCredits: " + subjectCredit; // Initialize the subject name text
         gradeInputField.onEndEdit.AddListener(OnGradeInputEndEdit); // Add listener for grade input field
         gradeInputField.onDeselect.AddListener(OnGradeInputEndEdit); // Add listener for grade input field focus
-        gradeInputField.onValueChanged.AddListener(OnGradeInputEndEdit); 
+        gradeInputField.onValueChanged.AddListener(OnGradeInputEndEdit);
+        gradeInputField.onSubmit.AddListener((text) => { OnGradeInputEndEdit(text); Vibrator.Vibrate(50); }); // Add listener for grade input field submit
         StartCoroutine(UpdateSubjectInfo()); // Start the coroutine to update the subject info
     }
 
