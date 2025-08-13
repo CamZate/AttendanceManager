@@ -21,6 +21,7 @@ public class sceneChanger : MonoBehaviour
         eventManagerButton.onClick.AddListener(() => { ChangeScene(2); StartCoroutine(toggleSidebar()); });
         int lastSceneIndex = PlayerPrefs.GetInt("LastScene", 0); // Get the last scene index or default to 0
         ChangeScene(lastSceneIndex); // Change to the last scene on start
+        // Hello
     }
 
     IEnumerator toggleSidebar()
